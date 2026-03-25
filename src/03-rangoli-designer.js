@@ -71,24 +71,83 @@
  */
 export function addColors(element, ...colors) {
   // Your code here
+    if (!element) return -1;
+
+  let count = 0;
+
+  for (let color of colors) {
+    if (!element.classList.contains(color)) {
+      element.classList.add(color);
+      count++;
+    }
+  }
+
+  return count;
 }
 
 export function removeColors(element, ...colors) {
   // Your code here
+    if (!element) return -1;
+
+  let count = 0;
+
+  for (let color of colors) {
+    if (element.classList.contains(color)) {
+      element.classList.remove(color);
+      count++;
+    }
+  }
+
+  return count;
+
 }
 
 export function togglePattern(element, pattern) {
   // Your code here
+    if (!element) return null;
+
+  const className = `pattern-${pattern}`;
+  const isNowPresent = element.classList.toggle(className);
+
+  return isNowPresent;
 }
 
 export function hasDesign(element, designName) {
   // Your code here
+    if (!element) return false;
+
+  return element.classList.contains(`design-${designName}`);
 }
 
 export function replaceDesign(element, oldDesign, newDesign) {
   // Your code here
+    if (!element) return false;
+
+  const oldClass = `design-${oldDesign}`;
+  const newClass = `design-${newDesign}`;
+
+  const existed = element.classList.contains(oldClass);
+
+  if (existed) {
+    element.classList.remove(oldClass);
+  }
+
+  element.classList.add(newClass);
+
+  return existed;
 }
 
 export function getActiveColors(element) {
   // Your code here
+    if (!element) return [];
+
+  const result = [];
+
+  for (let cls of element.classList) {
+    if (cls.startsWith("color-")) {
+      result.push(cls.replace("color-", ""));
+    }
+  }
+
+  return result;
 }
