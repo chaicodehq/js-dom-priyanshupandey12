@@ -85,20 +85,190 @@
  */
 export function validateName(name) {
   // Your code here
+   if (typeof name !== "string") {
+    return { valid: false, error: "Naam string hona chahiye" };
+  }
+
+  const trimmed = name.trim();
+
+
+  if (trimmed.length < 2) {
+    return {
+      valid: false,
+      error: "Naam mein kam se kam 2 characters hone chahiye",
+    };
+  }
+
+
+  if (trimmed.length > 50) {
+    return {
+      valid: false,
+      error: "Naam 50 characters se zyada nahi ho sakta",
+    };
+  }
+
+ 
+  const regex = /^[A-Za-z\s]+$/;
+  if (!regex.test(trimmed)) {
+    return {
+      valid: false,
+      error: "Naam mein sirf letters aur spaces allowed hain",
+    };
+  }
+
+  return { valid: true, error: null };
 }
 
 export function validateDate(dateString) {
   // Your code here
+  if (typeof dateString !== "string") {
+    return { valid: false, error: "Date string honi chahiye" };
+  }
+
+
+  const formatRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (!formatRegex.test(dateString)) {
+    return {
+      valid: false,
+      error: "Date YYYY-MM-DD format mein honi chahiye",
+    };
+  }
+
+
+  const [year, month, day] = dateString.split("-").map(Number);
+  const inputDate = new Date(year, month - 1, day);
+
+
+  if (
+    inputDate.getFullYear() !== year ||
+    inputDate.getMonth() !== month - 1 ||
+    inputDate.getDate() !== day
+  ) {
+    return {
+      valid: false,
+      error: "Date YYYY-MM-DD format mein honi chahiye",
+    };
+  }
+
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  inputDate.setHours(0, 0, 0, 0);
+
+
+  if (inputDate < today) {
+    return {
+      valid: false,
+      error: "Date aaj ya future ki honi chahiye",
+    };
+  }
+
+  return { valid: true, error: null };
 }
 
 export function validateAartiType(type) {
   // Your code here
+    if (typeof type !== "string") {
+    return { valid: false, error: "Aarti type string hona chahiye" };
+  }
+
+  const allowed = ["morning", "evening", "special"];
+
+
+  const normalized = type.trim().toLowerCase();
+
+  if (!allowed.includes(normalized)) {
+    return {
+      valid: false,
+      error: "Aarti type morning, evening, ya special mein se hona chahiye",
+    };
+  }
+
+  return { valid: true, error: null };
 }
 
 export function setupAartiForm(formElement, onSuccess, onError) {
   // Your code here
+   if (!formElement) return null;
+  if (typeof onSuccess !== "function" || typeof onError !== "function")
+    return null;
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const name = formElement.elements.name?.value;
+    const date = formElement.elements.date?.value;
+    const aartiType = formElement.elements.aartiType?.value;
+
+    const errors = [];
+
+    const nameRes = validateName(name);
+    if (!nameRes.valid) errors.push(nameRes.error);
+
+    const dateRes = validateDate(date);
+    if (!dateRes.valid) errors.push(dateRes.error);
+
+    const typeRes = validateAartiType(aartiType);
+    if (!typeRes.valid) errors.push(typeRes.error);
+
+    if (errors.length === 0) {
+      onSuccess({ name, date, aartiType });
+    } else {
+      onError(errors);
+    }
+  }
+
+  formElement.addEventListener("submit", handleSubmit);
+
+
+  return function cleanup() {
+    formElement.removeEventListener("submit", handleSubmit);
+  };
 }
 
 export function createBookingSummary(booking) {
   // Your code here
+  if (
+    !booking ||
+    typeof booking !== "object" ||
+    !booking.name ||
+    !booking.date ||
+    !booking.aartiType
+  ) {
+    return null;
+  }
+
+  const { name, date, aartiType } = booking;
+
+
+  const div = document.createElement("div");
+  div.className = "booking-summary";
+
+ 
+  const h3 = document.createElement("h3");
+  h3.textContent = "Booking Confirmation";
+
+
+  const pName = document.createElement("p");
+  pName.className = "booking-name";
+  pName.textContent = `Bhakt: ${name}`;
+
+
+  const pDate = document.createElement("p");
+  pDate.className = "booking-date";
+  pDate.textContent = `Date: ${date}`;
+
+
+  const pType = document.createElement("p");
+  pType.className = "booking-type";
+  pType.textContent = `Aarti: ${aartiType}`;
+
+ 
+  div.appendChild(h3);
+  div.appendChild(pName);
+  div.appendChild(pDate);
+  div.appendChild(pType);
+
+  return div;
 }

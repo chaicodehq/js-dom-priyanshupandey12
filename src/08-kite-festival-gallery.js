@@ -80,20 +80,150 @@
  */
 export function renderKiteCard(kite) {
   // Your code here
+  if (
+    !kite ||
+    typeof kite !== "object" ||
+    !kite.name ||
+    !kite.color ||
+    !kite.size ||
+    !kite.maker ||
+    !kite.image
+  ) {
+    return null;
+  }
+
+  const { name, color, size, maker, image } = kite;
+
+
+  const div = document.createElement("div");
+  div.className = "kite-card";
+
+
+  const img = document.createElement("img");
+  img.src = image;
+  img.alt = name;
+
+ 
+  const h3 = document.createElement("h3");
+  h3.className = "kite-name";
+  h3.textContent = name;
+
+
+  const pMaker = document.createElement("p");
+  pMaker.className = "kite-maker";
+  pMaker.textContent = `by ${maker}`;
+
+
+  const pInfo = document.createElement("p");
+  pInfo.className = "kite-info";
+  pInfo.textContent = `${size} - ${color}`;
+
+ 
+  div.appendChild(img);
+  div.appendChild(h3);
+  div.appendChild(pMaker);
+  div.appendChild(pInfo);
+
+  return div;
 }
 
 export function renderGallery(container, kites) {
   // Your code here
+  if (!container || !Array.isArray(kites)) return -1;
+
+ 
+  container.innerHTML = "";
+
+  let count = 0;
+
+  for (const kite of kites) {
+    const card = renderKiteCard(kite);
+
+
+    if (!card) continue;
+
+    container.appendChild(card);
+    count++;
+  }
+
+  return count;
 }
 
 export function filterKites(container, kites, filterFn) {
   // Your code here
+  if (!container) return -1;
+  if (!Array.isArray(kites) || typeof filterFn !== "function") return -1;
+
+
+  container.innerHTML = "";
+
+  let count = 0;
+
+  for (const kite of kites) {
+
+    if (!filterFn(kite)) continue;
+
+    const card = renderKiteCard(kite);
+
+  
+    if (!card) continue;
+
+    container.appendChild(card);
+    count++;
+  }
+
+  return count;
 }
 
 export function sortAndRender(container, kites, sortField, order) {
   // Your code here
+  if (!container) return [];
+  if (!Array.isArray(kites)) return [];
+
+
+  const copy = [...kites];
+
+
+  copy.sort((a, b) => {
+    const valA = a?.[sortField];
+    const valB = b?.[sortField];
+
+  
+    if (valA == null && valB == null) return 0;
+    if (valA == null) return 1;
+    if (valB == null) return -1;
+
+
+    if (typeof valA === "string" && typeof valB === "string") {
+      return order === "desc"
+        ? valB.localeCompare(valA)
+        : valA.localeCompare(valB);
+    }
+
+
+    return order === "desc" ? valB - valA : valA - valB;
+  });
+
+
+  renderGallery(container, copy);
+
+  return copy;
 }
+
 
 export function renderEmptyState(container, message) {
   // Your code here
+    if (!container) return false;
+
+
+  if (container.children.length > 0) {
+    return false;
+  }
+
+  const p = document.createElement("p");
+  p.className = "empty-state";
+  p.textContent = message;
+
+  container.appendChild(p);
+  return true;
 }
